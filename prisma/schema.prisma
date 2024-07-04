@@ -1,0 +1,71 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Posts {
+  id               Int         @id @unique @default(autoincrement())
+  title            String      @db.VarChar(255)
+  post_description String      @db.VarChar(255)
+  is_deleted       Boolean     @default(false)
+  createdAt        DateTime    @default(now())
+  UserDetails      UserDetails @relation(fields: [userDetailsId], references: [id], onDelete: Cascade)
+  userDetailsId    Int
+  user_name        String
+  comments         Comments[]
+
+  @@map("posts")
+}
+
+model UserDetails {
+  id            Int        @id @unique @default(autoincrement())
+  name          String
+  email         String
+  password      String
+  phone_number  String
+  gender        String
+  token         String     @default("")
+  is_deleted    Boolean    @default(false)
+  createdAt     DateTime   @default(now())
+  posts         Posts[]
+  Comments      Comments[]
+  profile_image File[]
+
+  @@map("userdetails")
+}
+
+model Comments {
+  id            Int         @id @unique @default(autoincrement())
+  comments      String
+  post          Posts       @relation(fields: [postID], references: [id])
+  postID        Int
+  userDetails   UserDetails @relation(fields: [userDetailsId], references: [id])
+  userDetailsId Int
+  user_name     String
+  is_deleted    Boolean     @default(false)
+  createdAt     DateTime    @default(now())
+
+  @@map("comments")
+}
+
+model File {
+  id            Int          @id @unique @default(autoincrement())
+  filename      String
+  fileData      Bytes
+  user_name     String
+  is_deleted    Boolean      @default(false)
+  UserDetails   UserDetails? @relation(fields: [userDetailsId], references: [id])
+  userDetailsId Int
+}
