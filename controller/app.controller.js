@@ -1135,6 +1135,7 @@ async function fileUpload(req, res) {
     }
 }
 
+
 async function readFile(req, res) {
     try {
 
@@ -1218,6 +1219,4 @@ module.exports = {
     fileUpload,
     readFile,
     test
-
-
 }
