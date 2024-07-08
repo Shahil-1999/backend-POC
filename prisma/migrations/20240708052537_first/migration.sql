@@ -20,6 +20,7 @@ CREATE TABLE `userdetails` (
     `password` VARCHAR(191) NOT NULL,
     `phone_number` VARCHAR(191) NOT NULL,
     `gender` VARCHAR(191) NOT NULL,
+    `role` ENUM('USER', 'ADMIN', 'GUEST') NOT NULL DEFAULT 'USER',
     `token` VARCHAR(191) NOT NULL DEFAULT '',
     `is_deleted` BOOLEAN NOT NULL DEFAULT false,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),

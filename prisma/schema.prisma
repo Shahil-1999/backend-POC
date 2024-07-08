@@ -5,9 +5,8 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "debian-openssl-3.0.x"]
-
 }
 
 datasource db {
@@ -30,12 +29,13 @@ model Posts {
 }
 
 model UserDetails {
-  id            Int        @id @unique @default(autoincrement())
-  name          String
-  email         String
-  password      String
-  phone_number  String
-  gender        String
+  id           Int    @id @unique @default(autoincrement())
+  name         String
+  email        String
+  password     String
+  phone_number String
+  gender       String
+  role         Role   @default(USER)
   token         String     @default("")
   is_deleted    Boolean    @default(false)
   createdAt     DateTime   @default(now())
@@ -44,6 +44,12 @@ model UserDetails {
   profile_image File[]
 
   @@map("userdetails")
+}
+
+enum Role {
+  USER
+  ADMIN
+  GUEST
 }
 
 model Comments {

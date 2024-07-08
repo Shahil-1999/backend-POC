@@ -114,6 +114,36 @@ const getUserImagePlugin = {
 
 }
 
+const getAllUserImagePlugin = {
+    'HapiSwagger': {
+        responses: {
+            200: {
+                description: `All User's Image Retreive`,
+            },
+            204: undefined, // pass-through "No Content" to swagger definition
+            400: {
+                description: 'Something wrong happened'
+            }
+        }
+    }
+
+}
+
+const getAllUserPlugin = {
+    'HapiSwagger': {
+        responses: {
+            200: {
+                description: `All User's  Retreive`,
+            },
+            204: undefined, // pass-through "No Content" to swagger definition
+            400: {
+                description: 'Something wrong happened'
+            }
+        }
+    }
+
+}
+
 const userAddPlugin = {
     'HapiSwagger': {
         responses: {
@@ -142,7 +172,6 @@ const userDeletionPlugin = {
         }
     }
 }
-
 
 const userLoginPlugin = {
     'HapiSwagger': {
@@ -230,6 +259,7 @@ const editPostPlugin = {
     }
 
 }
+
 const editOwnCommentPlugin = {
     'HapiSwagger': {
         responses: {
@@ -244,6 +274,7 @@ const editOwnCommentPlugin = {
     }
 
 }
+
 const deleteOwnCommentsInAnyPostPlugin ={
     'HapiSwagger': {
         responses: {
@@ -321,6 +352,8 @@ module.exports = {
     userDeletionPlugin,
     deleteOwnCommentsInAnyPostPlugin,
     uploadProfileImagPlugin,
-    getUserImagePlugin
+    getUserImagePlugin,
+    getAllUserImagePlugin,
+    getAllUserPlugin
     
 }

@@ -3,6 +3,7 @@ const app = express();
 const hapi = require('@hapi/hapi');
 const hapiJWT = require('hapi-auth-jwt2');
 require('dotenv').config();
+const HapiAuthorization = require('hapi-authorization');
 
 
 const PORT = process.env.PORT || 5000;
@@ -62,6 +63,12 @@ async function init() {
     {
       plugin: HapiSwagger,
       options: swaggerOptions
+    },
+    {
+      plugin: HapiAuthorization,
+        options: {
+            roles: ['ADMIN', 'USER', 'GUEST']
+        }
     }
   ]);
 

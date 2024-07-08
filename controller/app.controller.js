@@ -75,7 +75,8 @@ async function userLogin(req, res) {
             if (bcrypt.compareSync(req.payload.password, hashPassword)) {
                 const token = jwt.sign({
                     id: isUserExist.id,
-                    user_email: isUserExist.email
+                    user_email: isUserExist.email,
+                    scope: isUserExist.role
                 }, SECRET_KEY, {
                     expiresIn: '1y'
                 })
@@ -85,7 +86,8 @@ async function userLogin(req, res) {
                     data: {
                         userName: isUserExist.name,
                         token,
-                        userDetailsId: isUserExist.id
+                        userDetailsId: isUserExist.id,
+                        role: isUserExist.role
                     }
                 })
             } else {
@@ -130,6 +132,56 @@ async function getUserById(req, res) {
                     status: true,
                     message: 'user data fetch sucessfully',
                     data: user_data
+                })
+            } else {
+                return res.response({
+                    status: false,
+                    msg: "Please Check Your UserDetailsId (token's id and UserDetailsId is mismatched)"
+                })
+            }
+        }
+
+    } catch (error) {
+        console.log(error);
+        return res.response({
+            status: false,
+            msg: error
+        })
+    }
+
+}
+
+async function getAllUser(req, res) {
+    try {
+
+        const user_data = await prisma.userDetails.findFirst({
+            where: {
+                id: +req.params.id,
+                is_deleted: false
+            },
+
+        })
+        if (!user_data) {
+            return res.response({
+                status: false,
+                message: 'No user exist'
+            })
+
+        } else {
+
+            const getAllData = await prisma.userDetails.findMany({
+                where:{
+                    is_deleted: false
+                }
+            })
+            const { credentials } = req.auth
+            // console.log(user_data);
+        
+            if (credentials.id === +req.params.id) {
+                return res.response({
+                    status: true,
+                    message: 'user data fetch sucessfully',
+                    data: getAllData
                 })
             } else {
                 return res.response({
@@ -1135,17 +1187,16 @@ async function fileUpload(req, res) {
     }
 }
 
-
 async function readFile(req, res) {
     try {
 
-        const isStudentExit = await prisma.userDetails.findUnique({
+        const isUserExit = await prisma.userDetails.findUnique({
             where: {
                 id: +req.params.userDetailsId,
                 is_deleted: false
             }
         })
-        if (isStudentExit) {
+        if (isUserExit) {
 
             // Retrieve file data from Prisma
             const file = await prisma.file.findFirst({
@@ -1184,7 +1235,7 @@ async function readFile(req, res) {
         } else {
             return res.response({
                 status: false,
-                msg: "Student Does Not Exist",
+                msg: "User Does Not Exist",
                 data: {}
             })
         }
@@ -1192,10 +1243,69 @@ async function readFile(req, res) {
         console.log(error);
     }
 
-
-
 }
 
+async function readAllFile(req, res) {
+    try {
+        // Check if user exists and is not deleted
+        const isUserExist = await prisma.userDetails.findUnique({
+            where: {
+                id: +req.params.userDetailsId,
+                is_deleted: false
+            }
+        });
+
+        if (isUserExist) {
+            // Retrieve file data from Prisma
+            const files = await prisma.file.findMany({
+                where: {
+                    is_deleted: false
+                }
+            });
+
+            if (files.length === 0) {
+                return res.response({
+                    status: false,
+                    msg: "File not found"
+                });
+            } else {
+                const { credentials } = req.auth;
+                // console.log("files", files);
+                // console.log("credentials", credentials);
+
+                if (credentials?.id === +req.params.userDetailsId) {
+                    return res.response({
+                        status: true,
+                        msg: "Files fetched successfully",
+                        data: files.map(file => ({
+                            fileName: file.filename,
+                            fileData: file.fileData,
+                            userDetailsId: file.userDetailsId
+                        }))
+                    });
+                } else {
+                    return res.json({
+                        status: false,
+                        msg: "Please check your UserDetailsId (token's id and UserDetailsId mismatched)"
+                    });
+                }
+            }
+        } else {
+            return res.json({
+                status: false,
+                msg: "User does not exist",
+                data: {}
+            });
+        }
+    } catch (error) {
+        console.error(error);
+        return res.json({
+            status: false,
+            msg: "An error occurred",
+            error: error.message
+        });
+    }
+}
 
 
 
@@ -1218,5 +1328,7 @@ module.exports = {
     deleteOwnCommentsInAnyPost,
     fileUpload,
     readFile,
-    test
+    test,
+    getAllUser,
+    readAllFile
 }

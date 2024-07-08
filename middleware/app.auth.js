@@ -18,7 +18,7 @@ const JWTvalidate = async function (decode) {
             return { isValid: false };
         }
         else {
-            return { isValid: true };
+            return { isValid: true, credentials: { id: user.id, scope: user.role } };
         }
     } catch (error) {
         console.log("errorrrrr", error);

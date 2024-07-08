@@ -25,6 +25,28 @@ let routes = [
 
     },
 
+    // Admin can retrive All Users
+
+    {
+        method: 'GET',
+        path: '/user_details_admin/{id}',
+
+        options: {
+            handler: controller.getAllUser,
+            auth: {
+                strategy: 'jwt',
+                scope: ['ADMIN']  // Ensure this route is accessible only by admins
+            },
+            description: 'User Details',
+            tags: ['api'],
+            notes: ['User can see their details by entering respective id which is in token'],
+            validate: validation.getAllUserValidation,
+            plugins: plugins.getAllUserPlugin,
+
+
+        }
+
+    },
 
     // User can edit their post
 
@@ -45,8 +67,8 @@ let routes = [
 
     },
 
-
     // User Can Get Own Post
+
     {
         method: 'GET',
         path: '/read_own_post/{userDetailsId}',
@@ -168,6 +190,7 @@ let routes = [
         },
 
     },
+
     // User can delete own comments in any post
 
     {
@@ -205,6 +228,7 @@ let routes = [
     },
 
     // user can edit their comments
+
     {
         method: 'PUT',
         path: '/edit_own_comment/{userDetailsId}/{postId}/{commentsId}',
@@ -242,6 +266,7 @@ let routes = [
     },
 
     // User can add their profile image
+
     {
         method: 'POST',
         path: '/profile_img/upload',
@@ -259,11 +284,11 @@ let routes = [
                 parse: true,
                 multipart: true
             },
-            
+
         },
     },
 
-        // User can get their profile image
+    // User can get their profile image
 
     {
         method: 'GET',
@@ -276,6 +301,27 @@ let routes = [
             handler: controller.readFile,
             validate: validation.getImageValidation,
             plugins: plugins.getUserImagePlugin,
+        }
+    },
+    
+    // User can get their profile image
+
+    {
+        method: 'GET',
+        path: '/get_all_profile_image/{userDetailsId}',
+        options: {
+            auth: {
+                strategy: 'jwt',
+                scope: ['ADMIN']  // Ensure this route is accessible only by admins
+            },
+            description: 'Get profile iamge',
+            tags: ['api'],
+            notes: ['User can Get profile image'],
+            handler: controller.readAllFile,
+            validate: validation.getAllImageValidation,
+            plugins: plugins.getAllUserImagePlugin,
+
+
         }
     }
 
