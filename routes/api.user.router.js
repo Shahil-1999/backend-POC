@@ -2,6 +2,8 @@
 const controller = require('../controller/app.controller')
 const validation = require('../validations/app.validation')
 const plugins = require("../plugins/app.plugins")
+const subscriptionCheck = require('../middleware/app.subscription.auth')
+
 
 
 
@@ -46,6 +48,7 @@ let routes = [
         path: '/user_login',
 
         options: {
+            pre: [{ method: subscriptionCheck }],
             handler: controller.userLogin,
             auth: false,
             description: 'User can Logged into their account (Token not required for this endpoint)',

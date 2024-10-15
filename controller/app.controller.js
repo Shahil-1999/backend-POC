@@ -73,6 +73,20 @@ async function userLogin(req, res) {
         } else {
             let hashPassword = isUserExist.password;
             if (bcrypt.compareSync(req.payload.password, hashPassword)) {
+                const subscription = await prisma.subscription.findFirst({
+                    where: {
+                        userDetailsId: isUserExist.id,
+                        status: 'active'
+                    }
+                });
+    
+                if (!subscription || new Date() > new Date(subscription.endDate)) {
+                    return res.response({
+                        status: false,
+                        status_code: 400,
+                        message: "Your subscription has expired. Please renew to continue."
+                    });
+                }
                 const token = jwt.sign({
                     id: isUserExist.id,
                     user_email: isUserExist.email,
@@ -87,7 +101,9 @@ async function userLogin(req, res) {
                         userName: isUserExist.name,
                         token,
                         userDetailsId: isUserExist.id,
-                        role: isUserExist.role
+                        role: isUserExist.role,
+                        subscription_status: subscription.status,
+                        subscription_endDate: subscription.endDate
                     }
                 })
             } else {

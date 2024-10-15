@@ -29,19 +29,20 @@ model Posts {
 }
 
 model UserDetails {
-  id           Int    @id @unique @default(autoincrement())
-  name         String
-  email        String
-  password     String
-  phone_number String
-  gender       String
-  role         Role   @default(USER)
-  token         String     @default("")
-  is_deleted    Boolean    @default(false)
-  createdAt     DateTime   @default(now())
+  id            Int            @id @unique @default(autoincrement())
+  name          String
+  email         String
+  password      String
+  phone_number  String
+  gender        String
+  role          Role           @default(USER)
+  token         String         @default("")
+  is_deleted    Boolean        @default(false)
+  createdAt     DateTime       @default(now())
   posts         Posts[]
   Comments      Comments[]
   profile_image File[]
+  Subscription  Subscription[]
 
   @@map("userdetails")
 }
@@ -72,6 +73,18 @@ model File {
   fileData      Bytes
   user_name     String
   is_deleted    Boolean      @default(false)
+  UserDetails   UserDetails? @relation(fields: [userDetailsId], references: [id])
+  userDetailsId Int
+}
+
+model Subscription {
+  id            Int          @id @default(autoincrement())
+  planName      String
+  price         Float
+  startDate     DateTime     @default(now())
+  endDate       DateTime
+  is_deleted    Boolean      @default(false)
+  status        String       @default("active") // active, expired
   UserDetails   UserDetails? @relation(fields: [userDetailsId], references: [id])
   userDetailsId Int
 }
