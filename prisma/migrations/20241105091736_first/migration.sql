@@ -56,6 +56,20 @@ CREATE TABLE `File` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+-- CreateTable
+CREATE TABLE `subscription` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `planName` VARCHAR(191) NOT NULL DEFAULT 'Free_Trial',
+    `price` DOUBLE NOT NULL,
+    `startDate` DATETIME(3) NOT NULL,
+    `endDate` DATETIME(3) NOT NULL,
+    `is_deleted` BOOLEAN NOT NULL DEFAULT false,
+    `status` VARCHAR(191) NOT NULL DEFAULT 'active',
+    `userDetailsId` INTEGER NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 -- AddForeignKey
 ALTER TABLE `posts` ADD CONSTRAINT `posts_userDetailsId_fkey` FOREIGN KEY (`userDetailsId`) REFERENCES `userdetails`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -67,3 +81,6 @@ ALTER TABLE `comments` ADD CONSTRAINT `comments_userDetailsId_fkey` FOREIGN KEY 
 
 -- AddForeignKey
 ALTER TABLE `File` ADD CONSTRAINT `File_userDetailsId_fkey` FOREIGN KEY (`userDetailsId`) REFERENCES `userdetails`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `subscription` ADD CONSTRAINT `subscription_userDetailsId_fkey` FOREIGN KEY (`userDetailsId`) REFERENCES `userdetails`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

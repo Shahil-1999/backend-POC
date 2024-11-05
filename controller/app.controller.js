@@ -9,6 +9,7 @@ const SECRET_KEY = process.env.SECRET_KEY;
 const commonFunction = require("../common/app.commonFunction")
 const fs = require('fs');
 const path = require('path');
+const moment = require('moment')
 
 
 async function test(req, res) {
@@ -42,7 +43,17 @@ async function addUser(req, res) {
             let user = await prisma.userDetails.create({
                 data: req.payload
             })
-            // console.log("userrrrrr", user);
+            const startDate = moment().toISOString('YYYY-MM-DDTHH:mm:ss')
+            const endDate = moment(startDate).add(parseInt(1), 'days').toISOString('YYYY-MM-DDTHH:mm:ss')
+            await prisma.subscription.create({
+                data: {
+                    price: 0,
+                    startDate,
+                    endDate,
+                    userDetailsId: user.id
+                }
+            })
+
             return res.response({
                 status: true,
                 msg: "user add sucessfully",
@@ -79,7 +90,7 @@ async function userLogin(req, res) {
                         status: 'active'
                     }
                 });
-    
+
                 if (!subscription || new Date() > new Date(subscription.endDate)) {
                     return res.response({
                         status: false,
@@ -186,13 +197,13 @@ async function getAllUser(req, res) {
         } else {
 
             const getAllData = await prisma.userDetails.findMany({
-                where:{
+                where: {
                     is_deleted: false
                 }
             })
             const { credentials } = req.auth
             // console.log(user_data);
-        
+
             if (credentials.id === +req.params.id) {
                 return res.response({
                     status: true,
@@ -1125,7 +1136,7 @@ async function fileUpload(req, res) {
                 userDetailsId: userDetailsId
             }
         });
-        console.log(existingFile);
+        // console.log(existingFile);
 
         if (existingFile) {
             // Delete the existing file

@@ -78,13 +78,15 @@ model File {
 }
 
 model Subscription {
-  id            Int          @id @default(autoincrement())
-  planName      String
+  id            Int         @id @default(autoincrement())
+  planName      String      @default("Free_Trial")
   price         Float
-  startDate     DateTime     @default(now())
+  startDate     DateTime     
   endDate       DateTime
-  is_deleted    Boolean      @default(false)
-  status        String       @default("active") // active, expired
-  UserDetails   UserDetails? @relation(fields: [userDetailsId], references: [id])
+  is_deleted    Boolean     @default(false)
+  status        String      @default("active") // active, expired
+  UserDetails   UserDetails @relation(fields: [userDetailsId], references: [id])
   userDetailsId Int
+
+  @@map("subscription")
 }
