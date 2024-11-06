@@ -4,9 +4,7 @@ const prisma = new PrismaClient()
 const JWTvalidate = async function (decode) {
 
     try {
-        // let token = request.auth.token
-        // console.log(jwtDecode(token));
-        // console.log(decode);
+
         const user = await prisma.userDetails.findUnique({
             where: {
                 id: decode.id,
@@ -21,7 +19,7 @@ const JWTvalidate = async function (decode) {
             return { isValid: true, credentials: { id: user.id, scope: user.role } };
         }
     } catch (error) {
-        console.log("errorrrrr", error);
+        console.log("error", error);
     }
 };
 

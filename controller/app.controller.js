@@ -25,8 +25,6 @@ async function addUser(req, res) {
     try {
 
         const isUserExist = await commonFunction.isUserExist(req)
-
-
         if (isUserExist) {
             return res.response({
                 status: false,
@@ -41,7 +39,14 @@ async function addUser(req, res) {
 
 
             let user = await prisma.userDetails.create({
-                data: req.payload
+                data: {
+                    name: req.payload.name,
+                    email: req.payload.email,
+                    password: req.payload.password,
+                    phone_number: req.payload.phone_number,
+                    gender: req.payload.gender,
+                    role: req.payload.role
+                }
             })
             const startDate = moment().toISOString('YYYY-MM-DDTHH:mm:ss')
             const endDate = moment(startDate).add(parseInt(1), 'days').toISOString('YYYY-MM-DDTHH:mm:ss')
@@ -202,8 +207,6 @@ async function getAllUser(req, res) {
                 }
             })
             const { credentials } = req.auth
-            // console.log(user_data);
-
             if (credentials.id === +req.params.id) {
                 return res.response({
                     status: true,
@@ -229,10 +232,7 @@ async function getAllUser(req, res) {
 }
 
 async function addPost(req, res) {
-
-
     try {
-
 
         let isUserExist = await prisma.userDetails.findFirst({
             where: {
@@ -240,7 +240,6 @@ async function addPost(req, res) {
                 is_deleted: false
             }
         })
-        // console.log(isUserExist);
 
         if (!isUserExist) {
             return res.response({
@@ -249,18 +248,9 @@ async function addPost(req, res) {
             })
         } else {
             req.payload.user_name = isUserExist.name
-            // console.log(req.payload, isUserExist);
-
-
-
             let posts = await prisma.posts.create({
                 data: req.payload
             })
-
-
-            // console.log("payloadddddddd", req.payload);
-            // console.log(cred);
-            // console.log("aaaa",credentials.id, "bbbb",req.payload.userDetailsId);
             const { credentials } = req.auth
             if (credentials.id === req.payload.userDetailsId) {
                 return res.response({
@@ -290,7 +280,6 @@ async function addPost(req, res) {
 async function addCommentsOnAnyPost(req, res) {
 
     try {
-
         let isUserExist = await prisma.userDetails.findFirst({
             where: {
                 id: req.payload.userDetailsId,
@@ -320,9 +309,6 @@ async function addCommentsOnAnyPost(req, res) {
             } else {
 
                 req.payload.user_name = isUserExist.name
-
-
-
                 let comments = await prisma.comments.create({
                     data: req.payload
                 })
@@ -330,7 +316,6 @@ async function addCommentsOnAnyPost(req, res) {
 
 
                 const { credentials } = req.auth
-                // console.log(credentials.id, req.payload.userDetailsId);
                 if (credentials.id === req.payload.userDetailsId) {
 
                     return res.response({
@@ -374,10 +359,6 @@ async function readCommentsOnPost(req, res) {
             })
 
         } else {
-
-
-
-
             const comments_on_post = await prisma.comments.findMany({
                 where: {
                     userDetailsId: +req.params.userDetailsId,
@@ -390,25 +371,11 @@ async function readCommentsOnPost(req, res) {
                 }
 
             })
-            // const { credentials } = req.auth
-            // if (credentials.id === req.params.userDetailsId) {
-            //     // console.log(credentials.id,  req.params.userDetailsId);
             return res.response({
                 status: true,
                 message: 'all comments fetch sucessfully',
                 data: { comments_on_post }
             })
-            // } else {
-            //     return res.response({
-            //         status: false,
-            //         msg: "Please Check Your UserDetailsId (token's id and UserDetailsId is mismatched)"
-            //     })
-            // }
-
-
-
-
-
         }
     } catch (error) {
         console.log(error);
@@ -434,10 +401,6 @@ async function readAllPost(req, res) {
 
 
         if (isUserExist) {
-
-
-
-
             const readAllPosts = await prisma.posts.findMany({
                 where: {
                     is_deleted: false
@@ -446,8 +409,6 @@ async function readAllPost(req, res) {
                     comments: true
                 }
             })
-
-
 
             return res.response({
                 status: true,
@@ -461,15 +422,12 @@ async function readAllPost(req, res) {
             })
         }
 
-
-
     } catch (error) {
         console.log(error);
         return res.response({
             status: false,
             msg: error
         })
-
     }
 
 }
@@ -478,8 +436,6 @@ async function editPost(req, res) {
 
 
     try {
-
-
         let isUserExist = await prisma.userDetails.findFirst({
             where: {
                 id: req.params.userDetailsId,
@@ -512,7 +468,6 @@ async function editPost(req, res) {
 
                 const { credentials } = req.auth
                 if (credentials.id === req.params.userDetailsId) {
-                    // console.log(credentials.id,  req.params.userDetailsId);
                     return res.response({
                         status: true,
                         msg: "posts added sucessfully",
@@ -581,7 +536,6 @@ async function editOwnComments(req, res) {
                         },
                         data: req.payload
                     })
-                    console.log("comment.userDetailsId === +req.params.userDetailsId", comment.userDetailsId === +req.params.userDetailsId);
                     if (!(comment.userDetailsId === +req.params.userDetailsId)) {
 
                         return res.response({
@@ -593,7 +547,6 @@ async function editOwnComments(req, res) {
 
                         const { credentials } = req.auth
                         if (credentials.id === req.params.userDetailsId) {
-                            // console.log(credentials.id,  req.params.userDetailsId);
                             return res.response({
                                 status: true,
                                 msg: "Comment Updated",
@@ -635,9 +588,6 @@ async function editOwnComments(req, res) {
 
 async function readOwnPost(req, res) {
     try {
-
-
-
         const readOwnPosts = await prisma.posts.findMany({
             where: {
                 userDetailsId: +req.params.userDetailsId,
@@ -647,7 +597,6 @@ async function readOwnPost(req, res) {
                 comments: true
             }
         })
-
 
         const { credentials } = req.auth
 
@@ -663,10 +612,6 @@ async function readOwnPost(req, res) {
                 msg: "Please Check Your UserDetailsId (token's id and UserDetailsId is mismatched)"
             })
         }
-
-
-
-
     } catch (error) {
         console.log(error);
         return res.response({
@@ -711,7 +656,6 @@ async function deletePost(req, res) {
                 const post = await prisma.posts.update({
                     where: {
                         id: +req.params.postId //whatever you send in params it consider as string thats wh we downcast string to number
-
                     },
                     data: {
                         is_deleted: true
@@ -741,9 +685,6 @@ async function deletePost(req, res) {
                         msg: "Please Check Your UserDetailsId (token's id and UserDetailsId is mismatched)"
                     })
                 }
-
-
-
             }
 
 
@@ -784,20 +725,16 @@ async function deleteOwnPostComment(req, res) {
                     status: false,
                     msg: "comments dosent exist "
                 })
-
             }
-
             const comments = await prisma.comments.update({
                 where: {
                     id: +req.params.commentsId //whatever you send in params it consider as string thats wh we downcast string to number
-
                 },
                 data: {
                     is_deleted: true
                 }
             })
             const { credentials } = req.auth
-
             if (credentials.id === +req.params.userDetailsId) {
                 return res.response({
                     status: true,
@@ -855,7 +792,6 @@ async function deleteOwnCommentsInAnyPost(req, res) {
                 const comments = await prisma.comments.update({
                     where: {
                         id: +req.params.commentsId //whatever you send in params it consider as string thats wh we downcast string to number
-
                     },
                     data: {
                         is_deleted: true
@@ -906,18 +842,15 @@ async function deleteAccount(req, res) {
                 where: {
                     id: +req.params.userDetailsId, //whatever you send in params it consider as string thats why we downcast string to number
                     is_deleted: false
-
                 },
                 data: {
                     is_deleted: true
                 }
             })
-            // console.log("userAcct0", userAcct);
             const userPost = await prisma.posts.updateMany({
                 where: {
                     userDetailsId: +req.params.userDetailsId, //whatever you send in params it consider as string thats why we downcast string to number
                     is_deleted: false
-
                 },
                 data: {
                     is_deleted: true
@@ -931,7 +864,6 @@ async function deleteAccount(req, res) {
                 },
 
             })
-            // console.log("userPostCommentsBeforeDeletion", userDeletedPost);
 
             const deletedUserPostIds = userDeletedPost.map(post => post.id);
 
@@ -951,10 +883,6 @@ async function deleteAccount(req, res) {
 
             // Execute all comment deletion promises
             await Promise.all(deleteCommentsPromises);
-            console.log("deleteCommentsPromises", deleteCommentsPromises);
-
-
-
             const { credentials } = req.auth
 
             if (credentials.id === +req.params.userDetailsId) {
@@ -970,9 +898,6 @@ async function deleteAccount(req, res) {
                 })
             }
         }
-
-
-
     } catch (error) {
         console.log(error);
         return res.response({
@@ -998,7 +923,6 @@ async function sendMail(userName, email, token) {
             }
         })
 
-        // console.log("mailTransporter", mailTransporter);
         const mailOptions = {
             from: process.env.USER_EMAIL,
             to: email,
@@ -1006,7 +930,6 @@ async function sendMail(userName, email, token) {
             html: `<h1> Password Reset: </h1> <span> please reset your password <a href= "http://localhost:3000/reset_password?token=${token}"> Reset Your Passsword </a>`
 
         }
-        // console.log("mailOptions", mailOptions);
         mailTransporter.sendMail(mailOptions, ((err, info) => {
             if (err) {
                 console.log("Error", err);
@@ -1059,9 +982,7 @@ async function forgetPassword(req, res) {
 async function resetPassword(req, res) {
     try {
 
-        // console.log(req.auth);
         const { credentials } = req.auth
-        // console.log(+req.params.userDetailsId);
 
         if (credentials.id === +req.params.userDetailsId) {
             let tokenVerification = await prisma.userDetails.findFirst({
@@ -1103,9 +1024,6 @@ async function resetPassword(req, res) {
             })
         }
 
-
-
-
     } catch (error) {
         console.log(error);
     }
@@ -1121,7 +1039,6 @@ async function fileUpload(req, res) {
                 is_deleted: false
             }
         });
-        // console.log("isUserExist.name", isUserExist.name);
 
         if (!isUserExist) {
             return res.response({
@@ -1136,7 +1053,6 @@ async function fileUpload(req, res) {
                 userDetailsId: userDetailsId
             }
         });
-        // console.log(existingFile);
 
         if (existingFile) {
             // Delete the existing file
@@ -1152,7 +1068,6 @@ async function fileUpload(req, res) {
 
         // Process the uploaded file
         const file = req.payload.file;
-        // console.log("file", file);
 
         if (!file) {
             return res.response({
@@ -1240,9 +1155,7 @@ async function readFile(req, res) {
             } else {
 
                 // Serve file data
-                // return res.response(file.fileData).header('Content-Disposition', `attachment; filename="${file.filename}"`);
                 const { credentials } = req.auth
-                // console.log("credentials", credentials);
                 if (credentials?.id === +req.params.userDetailsId) {
                     return res.response({
                         status: true,
@@ -1297,9 +1210,6 @@ async function readAllFile(req, res) {
                 });
             } else {
                 const { credentials } = req.auth;
-                // console.log("files", files);
-                // console.log("credentials", credentials);
-
                 if (credentials?.id === +req.params.userDetailsId) {
                     return res.response({
                         status: true,
@@ -1351,7 +1261,9 @@ module.exports = {
     deleteAccount,
     forgetPassword,
     resetPassword,
-    editOwnComments,
+    editOwnComments,              // console.log("files", files);
+    // console.log("credentials", credentials);
+
     deleteOwnCommentsInAnyPost,
     fileUpload,
     readFile,
